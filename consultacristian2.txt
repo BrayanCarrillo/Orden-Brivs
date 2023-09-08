@@ -1,0 +1,3 @@
+SELECT o.Id_Orden, o.Fecha_hora_inicio, o.Fecha_hora_finalizacion, o.Total, u.Nombre1 AS Mesero_Nombre
+FROM orden o
+JOIN usuario u ON o.Mesero_Usuario_Id_Usuario = u.Id_Usuario;
