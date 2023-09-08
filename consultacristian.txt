@@ -1,0 +1,11 @@
+SELECT AVG(TIMESTAMPDIFF(MINUTE, m1.Fecha_Hora, m2.Fecha_Hora)) AS Promedio_Minutos
+FROM (
+    SELECT Id_Mesa, Fecha_Hora
+    FROM mesa
+    WHERE Estado = 'Disponible'
+) m1
+JOIN (
+    SELECT Id_Mesa, Fecha_Hora
+    FROM mesa
+    WHERE Estado = 'Ocupada'
+) m2 ON m1.Id_Mesa = m2.Id_Mesa;
