@@ -10,7 +10,7 @@
 <div> <h3><li>Programador:</h3> <img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/Natalia%20Soto?color=purple&style=for-the-badge"> </li> </div>
 <div> <h3><li>Redactor:</h3> <img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/Diego%20Mill%C3%A1n?color=red%20&style=for-the-badge"> </li> </div>
 <div> <h3><li>Analista:</h3> <img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/Paula%20Vargas?color=green&style=for-the-badge"> </li> </div>
-<h2>Miembros del grupo 6, ficha 2693507, del programa "Anàlisis y desarrollo de software", el mejor grupo </h2>
+<h2>Miembros del grupo 6, ficha 2693507, del programa "Anàlisis y desarrollo de software" </h2>
 </div>
 
 ## Nuestros proyectos:
