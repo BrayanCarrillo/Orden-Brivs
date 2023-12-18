@@ -1,0 +1,4 @@
+SELECT n.Id_Notificacion, n.Cocinero_Id_cocinero, c.Nombre_plato
+FROM notificacion n
+JOIN plato c ON n.Mesa_Id_Mesa = c.Factura_Id_Factura
+WHERE n.Cocinero_Id_cocinero = 2;
