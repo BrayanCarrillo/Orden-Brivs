@@ -1,28 +1,70 @@
-<h1 aling="center">Bienvenid@ al repositorio de La pescadería</h1>
+# Getting Started with Create React App
 
-![](https://github.com/BrayanCarrillo/Orden-Brivs/blob/main/Logo%20Orden%20Brivs.png)  
-<h2 aling="center">Empresa de desarrollo de software; nos enfocamos en dar solución a tus problemáticas empleando la programación y conociendo tu entorno.</h2>
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-<div>
-<h2>Conformado por: </h2>
-<div> <h3><li>Diseñador:</h3> <img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/Cristian%20Alvarez?color=orange&style=for-the-badge"> </li> </div> 
-<div> <h3><li>Lider:</h3> <img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/Brayan%20Carrillo?color=blue%20&style=for-the-badge"> </li> </div>
-<div> <h3><li>Programador:</h3> <img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/Natalia%20Soto?color=purple&style=for-the-badge"> </li> </div>
-<div> <h3><li>Analista:</h3> <img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/Paula%20Vargas?color=green&style=for-the-badge"> </li> </div>
-<h2>Miembros del grupo 6, ficha 2693507, del programa "Anàlisis y desarrollo de software" </h2>
-</div>
+## Available Scripts
 
-## Nuestros proyectos:
-### Orden brivs desarrolla innovadores proyectos que facilitan la cotidianidad de quienes lo requieres
-#### - La pescadería: Toma y gestión de órdenes por medio de un sistema de información que facilita las labores de los meseros, chefs y cajeros, centrándose en la atención y servicio al cliente otorgándole el control sobre su orden.
-![](https://github.com/BrayanCarrillo/Orden-Brivs/blob/main/Pagina%20principal%20maqueta.jpeg)   
-## Objetivo general de la pescadería
-### Implementar un aplicativo que permita a los clientes realizar sus pedidos de forma más rápida y eficiente, permitiendo al restaurante gestionar y procesar los pedidos de una manera más efectiva aportando al o los restaurantes una mejora en eficiencia y calidad en su servicio de atención al cliente, y funcionamiento logístico y práctico 
-## Objetivos de La pescadería -
-<ul>
-  <li>Implementar: El sistema permitirá al mesero ingresar la orden del cliente, confirmar los ingredientes disponibles, y transmitir la orden a la cocina de manera nstantánea y precisa</li>
-  <li>Organizar: El sistema asignará un número y hora a cada orden, posteriormente mostrará el estado y tiempo de entrega estimado en una pantalla visible para el mesero, cocinero y cliente. </li>
-  <li>Facilitar: El sistema facilitará la toma de pedidos para el mesero, y su envío a la cocina se realizará de manera instantánea</li>
-</ul>
+In the project directory, you can run:
 
----
+### `npm start`
+
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
+
+### `npm test`
+
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+
+### `npm run build`
+
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
+
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
+
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+### `npm run eject`
+
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+
+## Learn More
+
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+
+To learn React, check out the [React documentation](https://reactjs.org/).
+
+### Code Splitting
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+
+### Analyzing the Bundle Size
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+
+### Making a Progressive Web App
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+
+### Advanced Configuration
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+
+### Deployment
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+
+### `npm run build` fails to minify
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
