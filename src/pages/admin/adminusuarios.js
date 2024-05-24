@@ -6,15 +6,17 @@ import { FaPowerOff } from "react-icons/fa";
 import { MdEventAvailable } from "react-icons/md";
 import { IoPersonCircle } from "react-icons/io5";
 import { MdTableRestaurant } from "react-icons/md";
-
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { Table, Pagination } from 'react-bootstrap';
 import "./adminusuarios.css";
 
 function AdminUsuarios() {
   const [users, setUsers] = useState([]);
   const [newUserName, setNewUserName] = useState('');
   const [newUserRole, setNewUserRole] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const registrosPorPagina = 10;
 
   useEffect(() => {
     fetchUsers();
@@ -34,9 +36,9 @@ function AdminUsuarios() {
     try {
       await axios.post('http://localhost:8000/api/empleados', { 
         username: newUserName,
-        status: true, // Cambiado de activate a status
+        status: true,
         role: newUserRole.toLowerCase(),
-        password: '1234abcd'  
+        password: '1234abcd'
       });
       fetchUsers();
       setNewUserName('');
@@ -66,12 +68,39 @@ function AdminUsuarios() {
 
   const handleToggleEstadoEmpleado = async (id, status) => {
     try {
-      const newStatus = !status; // Invertir el estado actual
-      await axios.put(`http://localhost:8000/api/empleados/${id}/estado`, { status: newStatus }); // Cambiado de activate a status
+      const newStatus = !status;
+      await axios.put(`http://localhost:8000/api/empleados/${id}/estado`, { status: newStatus });
       fetchUsers();
     } catch (error) {
       console.error('Error toggling employee status:', error);
     }
+  };
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const paginar = (datos, paginaActual) => {
+    const startIndex = (paginaActual - 1) * registrosPorPagina;
+    const endIndex = startIndex + registrosPorPagina;
+    return datos.slice(startIndex, endIndex);
+  };
+
+  const usuariosPaginados = paginar(users, currentPage);
+
+  const renderPagination = () => {
+    const totalPages = Math.ceil(users.length / registrosPorPagina);
+    const items = [];
+    for (let number = 1; number <= totalPages; number++) {
+      items.push(
+        <Pagination.Item key={number} active={number === currentPage} onClick={() => handlePageChange(number)}>
+          {number}
+        </Pagination.Item>
+      );
+    }
+    return (
+      <Pagination>{items}</Pagination>
+    );
   };
 
   return (
@@ -137,7 +166,7 @@ function AdminUsuarios() {
                     <p>Lista Actual de Empleados</p>
                   </div>
                   <div className="table-responsive">
-                    <table className="order-table">
+                    <Table striped bordered hover>
                       <thead className="table-primary">
                         <tr>
                           <th>#</th>
@@ -148,11 +177,11 @@ function AdminUsuarios() {
                         </tr>
                       </thead>
                       <tbody>
-                        {users.map((user) => (
+                        {usuariosPaginados.map((user) => (
                           <tr key={user.staffID}>
                             <td>{user.staffID}</td>
                             <td>{user.username}</td>
-                            <td>{user.status ? "Activo" : "Inactivo"}</td> {/* Cambiado de activate a status */}
+                            <td>{user.status ? "Activo" : "Inactivo"}</td>
                             <td>
                               <select className="form-select" value={user.role} onChange={(e) => handleActualizarRol(user.staffID, e.target.value)}>
                                 <option value="mesero">Mesero</option>
@@ -161,10 +190,10 @@ function AdminUsuarios() {
                             </td>
                             <td>
                               <button
-                                className={user.status ? "btn btn-secondary" : "btn btn-success"} // Cambiar de acuerdo al estado
+                                className={user.status ? "btn btn-secondary" : "btn btn-success"}
                                 onClick={() => handleToggleEstadoEmpleado(user.staffID, user.status)}
                               >
-                                {user.status ? "Desactivar" : "Activar"} {/* Cambiar de acuerdo al estado */}
+                                {user.status ? "Desactivar" : "Activar"}
                               </button>
                               <button
                                 className="btn btn-danger"
@@ -176,7 +205,8 @@ function AdminUsuarios() {
                           </tr>
                         ))}
                       </tbody>
-                    </table>
+                    </Table>
+                    {renderPagination()}
                   </div>
                 </div>
               </div>

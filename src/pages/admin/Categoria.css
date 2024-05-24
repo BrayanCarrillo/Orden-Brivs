@@ -1,34 +1,6 @@
-/* Agregamos algunos estilos para los botones */
-button {
-  padding: 10px 20px;
-  margin-right: 10px;
-  cursor: pointer;
-  border: none;
-  border-radius: 5px;
-  background-color: #007bff; /* Azul */
-  color: white;
-}
-
-/* Estilos para la tabla */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-th, td {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: left;
-}
-
-th {
-  background-color: #f2f2f2;
-  color: #333;
-}
-
-/* Estilos para la barra lateral */
+/* Barra lateral */
 .sidebar {
+  position: fixed;
   width: 200px;
   background-color: #333;
   padding-top: 60px;
@@ -52,6 +24,54 @@ th {
   display: block;
 }
 
+/* Contenedor principal */
+.wrapper {
+  display: flex;
+}
+
+.content {
+  margin-left: 200px; /* Asegúrate de que el contenido no esté debajo de la barra lateral */
+  padding: 20px;
+  flex: 1;
+}
+
+/* Estilos para la tabla */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+  color: #333;
+}
+
+/* Estilos para los botones */
+button {
+  padding: 10px 20px;
+  margin-right: 10px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff; /* Azul */
+  color: white;
+}
+
+.action-btn {
+  padding: 5px 10px;
+  margin-right: 5px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+}
+
 /* Estilos para los íconos */
 .iconosbarra {
   display: flex;
@@ -60,50 +80,17 @@ th {
   padding: 10px; /* Añadimos padding para espaciar los íconos */
 }
 
-/* Estilos para los contenedores de categorías y platos */
-.container {
-  display: flex;
+/* Alert */
+.alert-fixed {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%;
+  z-index: 9999;
 }
 
-/* Estilos para los títulos de sección */
-.section-title {
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
-
-/* Estilos para los inputs */
-
-/* Estilos para los botones de agregar y eliminar */
-.action-btn {
-  padding: 5px 10px;
-  margin-right: 5px; /* Reducimos el margen para dejar espacio */
-  cursor: pointer;
-  border: none;
-  border-radius: 5px;
-}
-
-.wrapper {
-  display: flex;
-}
-
-.content {
-  padding: 20px;
-  flex: 1;
-}
-
-.card {
-  width: 100%; /* Cambiamos el ancho para ocupar todo el espacio disponible */
-  margin-top: 20px;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
-}
-
-
- /* Alert */
-
- .carda {
+.carda {
   overflow: hidden;
   position: relative;
   background-color: #ffffff;
@@ -191,14 +178,4 @@ th {
   border-radius: 0.375rem;
   border: 1px solid #D1D5DB;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-}
-/* Categoria.css */
-
-.alert-fixed {
-  position: fixed;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 50%;
-  z-index: 9999;
 }
