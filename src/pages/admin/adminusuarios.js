@@ -8,7 +8,7 @@ import { IoPersonCircle } from "react-icons/io5";
 import { MdTableRestaurant } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { Table, Pagination } from 'react-bootstrap';
+import { Table, Pagination, Alert, Button } from 'react-bootstrap';
 import "./adminusuarios.css";
 
 function AdminUsuarios() {
@@ -16,6 +16,8 @@ function AdminUsuarios() {
   const [newUserName, setNewUserName] = useState('');
   const [newUserRole, setNewUserRole] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [showDishAlert, setShowDishAlert] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
   const registrosPorPagina = 10;
 
   useEffect(() => {
@@ -48,13 +50,15 @@ function AdminUsuarios() {
     }
   };
 
-  const handleEliminarEmpleado = async (id) => {
+  const handleEliminarEmpleado = async () => {
     try {
-      await axios.delete(`http://localhost:8000/api/empleados/${id}`);
+      await axios.delete(`http://localhost:8000/api/empleados/${userToDelete.staffID}`);
       fetchUsers();
     } catch (error) {
       console.error('Error deleting user:', error);
     }
+    setShowDishAlert(false);
+    setUserToDelete(null);
   };
 
   const handleActualizarRol = async (id, newRole) => {
@@ -103,6 +107,11 @@ function AdminUsuarios() {
     );
   };
 
+  const showDeleteAlert = (user) => {
+    setUserToDelete(user);
+    setShowDishAlert(true);
+  };
+
   return (
     <div className="app-container">
       <header className="navbar">
@@ -144,7 +153,7 @@ function AdminUsuarios() {
             <li>
               <div className="iconosbarra">
                 <IoMdSettings size={20} />
-                <Link to="/Ajustes" className="nav-link">Ajustes</Link>
+                <Link to="/Ajustes" className="nav-link">Contraseñas</Link>
               </div>
             </li>
             <li>
@@ -197,7 +206,7 @@ function AdminUsuarios() {
                               </button>
                               <button
                                 className="btn btn-danger"
-                                onClick={() => handleEliminarEmpleado(user.staffID)}
+                                onClick={() => showDeleteAlert(user)}
                               >
                                 Eliminar
                               </button>
@@ -242,6 +251,21 @@ function AdminUsuarios() {
           </div>
         </div>
       </div>
+      <Alert show={showDishAlert} variant="danger" className="alert-fixed">
+        <Alert.Heading>¡Atención!</Alert.Heading>
+        <p>
+          ¿Estás seguro de que deseas eliminar este usuario? Esta acción no se podrá deshacer y podría afectar tus consultas.
+        </p>
+        <hr />
+        <div className="d-flex justify-content-end">
+          <Button onClick={() => setShowDishAlert(false)} variant="success">
+            Cancelar
+          </Button>
+          <Button onClick={handleEliminarEmpleado} variant="danger" className="ms-2">
+            Borrar
+          </Button>
+        </div>
+      </Alert>
     </div>
   );
 }

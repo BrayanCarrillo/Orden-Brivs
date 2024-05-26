@@ -278,7 +278,7 @@ function Categoria() {
             <li>
               <div className="iconosbarra">
                 <IoMdSettings size={20} />
-                <Link to="/Ajustes" className="nav-link">Ajustes</Link>
+                <Link to="/Ajustes" className="nav-link">Contraseñas</Link>
               </div>
             </li>
             <li>

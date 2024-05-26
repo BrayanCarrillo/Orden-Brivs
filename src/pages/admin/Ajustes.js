@@ -97,7 +97,7 @@ function Ajustes() {
             <SidebarItem icon={<MdEventAvailable size={20} />} to="/Ventas" text="Ventas" />
             <SidebarItem icon={<IoPersonCircle size={20} />} to="/adminusuarios" text="Empleados" />
             <SidebarItem icon={<MdTableRestaurant size={20} />} to="/Mesa" text="Mesas" />
-            <SidebarItem icon={<IoMdSettings size={20} />} to="/Ajustes" text="Ajustes" />
+            <SidebarItem icon={<IoMdSettings size={20} />} to="/Ajustes" text="Contraseñas" />
             <SidebarItem icon={<FaPowerOff size={20} />} to="/inicio" text="Cerrar sesión" />
           </ul>
         </div>
