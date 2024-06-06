@@ -8,17 +8,12 @@ import { IoPersonCircle } from "react-icons/io5";
 import { MdTableRestaurant } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { Table, Pagination, Alert, Button } from 'react-bootstrap';
 import "./adminusuarios.css";
 
 function AdminUsuarios() {
   const [users, setUsers] = useState([]);
   const [newUserName, setNewUserName] = useState('');
   const [newUserRole, setNewUserRole] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [showDishAlert, setShowDishAlert] = useState(false);
-  const [userToDelete, setUserToDelete] = useState(null);
-  const registrosPorPagina = 10;
 
   useEffect(() => {
     fetchUsers();
@@ -36,10 +31,10 @@ function AdminUsuarios() {
   const handleAgregarEmpleado = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8000/api/empleados', { 
+      const response = await axios.post('http://localhost:8000/api/empleados', { 
         username: newUserName,
-        status: true,
-        role: newUserRole.toLowerCase(),
+        status: 'activo',
+        role: newUserRole.toLowerCase(), // Convertir a minúsculas
         password: '1234abcd'
       });
       fetchUsers();
@@ -50,71 +45,27 @@ function AdminUsuarios() {
     }
   };
 
-  const handleEliminarEmpleado = async () => {
+  const handleEliminarEmpleado = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/api/empleados/${userToDelete.staffID}`);
+      await axios.delete(`http://localhost:8000/api/empleados/${id}`);
       fetchUsers();
     } catch (error) {
       console.error('Error deleting user:', error);
     }
-    setShowDishAlert(false);
-    setUserToDelete(null);
   };
 
   const handleActualizarRol = async (id, newRole) => {
     try {
-      await axios.put(`http://localhost:8000/api/empleados/${id}/rol`, { role: newRole.toLowerCase() });
+      await axios.put(`http://localhost:8000/api/empleados/${id}/rol`, { role: newRole.toLowerCase() }); // Convertir a minúsculas
       fetchUsers();
     } catch (error) {
       console.error('Error updating role:', error);
     }
   };
 
-  const handleToggleEstadoEmpleado = async (id, status) => {
-    try {
-      const newStatus = !status;
-      await axios.put(`http://localhost:8000/api/empleados/${id}/estado`, { status: newStatus });
-      fetchUsers();
-    } catch (error) {
-      console.error('Error toggling employee status:', error);
-    }
-  };
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  const paginar = (datos, paginaActual) => {
-    const startIndex = (paginaActual - 1) * registrosPorPagina;
-    const endIndex = startIndex + registrosPorPagina;
-    return datos.slice(startIndex, endIndex);
-  };
-
-  const usuariosPaginados = paginar(users, currentPage);
-
-  const renderPagination = () => {
-    const totalPages = Math.ceil(users.length / registrosPorPagina);
-    const items = [];
-    for (let number = 1; number <= totalPages; number++) {
-      items.push(
-        <Pagination.Item key={number} active={number === currentPage} onClick={() => handlePageChange(number)}>
-          {number}
-        </Pagination.Item>
-      );
-    }
-    return (
-      <Pagination>{items}</Pagination>
-    );
-  };
-
-  const showDeleteAlert = (user) => {
-    setUserToDelete(user);
-    setShowDishAlert(true);
-  };
-
   return (
     <div className="app-container">
-      <header className="navbar">
+       <header className="navbar">
         <h1>Placeres del mar | OrdenBrivs</h1>
       </header>
       <div className="wrapper">
@@ -153,7 +104,7 @@ function AdminUsuarios() {
             <li>
               <div className="iconosbarra">
                 <IoMdSettings size={20} />
-                <Link to="/Ajustes" className="nav-link">Contraseñas</Link>
+                <Link to="/Ajustes" className="nav-link">Ajustes</Link>
               </div>
             </li>
             <li>
@@ -175,7 +126,7 @@ function AdminUsuarios() {
                     <p>Lista Actual de Empleados</p>
                   </div>
                   <div className="table-responsive">
-                    <Table striped bordered hover>
+                    <table className="order-table">
                       <thead className="table-primary">
                         <tr>
                           <th>#</th>
@@ -186,11 +137,11 @@ function AdminUsuarios() {
                         </tr>
                       </thead>
                       <tbody>
-                        {usuariosPaginados.map((user) => (
+                        {users.map((user) => (
                           <tr key={user.staffID}>
                             <td>{user.staffID}</td>
                             <td>{user.username}</td>
-                            <td>{user.status ? "Activo" : "Inactivo"}</td>
+                            <td>{user.status}</td>
                             <td>
                               <select className="form-select" value={user.role} onChange={(e) => handleActualizarRol(user.staffID, e.target.value)}>
                                 <option value="mesero">Mesero</option>
@@ -198,24 +149,12 @@ function AdminUsuarios() {
                               </select>
                             </td>
                             <td>
-                              <button
-                                className={user.status ? "btn btn-secondary" : "btn btn-success"}
-                                onClick={() => handleToggleEstadoEmpleado(user.staffID, user.status)}
-                              >
-                                {user.status ? "Desactivar" : "Activar"}
-                              </button>
-                              <button
-                                className="btn btn-danger"
-                                onClick={() => showDeleteAlert(user)}
-                              >
-                                Eliminar
-                              </button>
+                              <button className="btn btn-danger" onClick={() => handleEliminarEmpleado(user.staffID)}>Eliminar</button>
                             </td>
                           </tr>
                         ))}
                       </tbody>
-                    </Table>
-                    {renderPagination()}
+                    </table>
                   </div>
                 </div>
               </div>
@@ -251,21 +190,6 @@ function AdminUsuarios() {
           </div>
         </div>
       </div>
-      <Alert show={showDishAlert} variant="danger" className="alert-fixed">
-        <Alert.Heading>¡Atención!</Alert.Heading>
-        <p>
-          ¿Estás seguro de que deseas eliminar este usuario? Esta acción no se podrá deshacer y podría afectar tus consultas.
-        </p>
-        <hr />
-        <div className="d-flex justify-content-end">
-          <Button onClick={() => setShowDishAlert(false)} variant="success">
-            Cancelar
-          </Button>
-          <Button onClick={handleEliminarEmpleado} variant="danger" className="ms-2">
-            Borrar
-          </Button>
-        </div>
-      </Alert>
     </div>
   );
 }

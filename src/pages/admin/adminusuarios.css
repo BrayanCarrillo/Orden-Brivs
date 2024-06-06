@@ -64,9 +64,6 @@ body {
   margin-bottom: 20px;
   font-size: 24px;
   color: #333333;
-  white-space: nowrap; /* Evitar que el título se divida en varias líneas */
-  overflow: hidden; /* Ocultar el texto que se desborda */
-  text-overflow: ellipsis; /* Agregar puntos suspensivos (...) al texto que se desborda */
 }
 
 .card-content {
@@ -80,8 +77,8 @@ body {
 
 .form-wrapper {
   width: 100%;
-  max-width: 500px;
-  margin: 2px 0; /* Cambiar el margen superior a 20px y quitar el margen derecho e izquierdo */
+  max-width: 400px;
+  margin: 2px;
 }
 
 .form-label {
@@ -121,7 +118,6 @@ body {
 .btn:hover {
   background-color: #333638;
 }
-
 .content-wrapper {
   display: flex;
   flex-wrap: wrap;
@@ -130,12 +126,11 @@ body {
 }
 
 .table-wrapper {
-  flex: 1; /* Hacer que este contenedor ocupe todo el espacio disponible */
-  margin-right: 10px; /* Agregamos un pequeño margen derecho para separarlo del siguiente contenedor */
+  margin-right: 10px;
 }
 
 .form-wrapper {
   width: 100%;
-  max-width: 400px;
-  margin: 2px; /* Cambiar el margen superior a 20px y quitar el margen derecho e izquierdo */
+  max-width: 500px;
+  margin: 2px 0; /* Cambiar el margen superior a 20px y quitar el margen derecho e izquierdo */
 }

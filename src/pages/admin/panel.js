@@ -9,14 +9,10 @@ import { IoPersonCircle } from "react-icons/io5";
 import { MdTableRestaurant } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { Table, Pagination } from 'react-bootstrap';
 
 function Panel() {
   const [ordenes, setOrdenes] = useState([]);
   const [empleados, setEmpleados] = useState([]);
-  const [ordenesPagina, setOrdenesPagina] = useState(1);
-  const [empleadosPagina, setEmpleadosPagina] = useState(1);
-  const registrosPorPagina = 5;
 
   useEffect(() => {
     fetchOrdenesListas();
@@ -27,7 +23,7 @@ function Panel() {
     try {
       const response = await fetch('http://127.0.0.1:8000/api/ordenes/listas');
       const data = await response.json();
-      setOrdenes(data.ordenes);
+      setOrdenes(data.ordenes.slice(0, 5)); // Mostrar como máximo 5 órdenes
     } catch (error) {
       console.error('Error al obtener las órdenes:', error);
     }
@@ -41,34 +37,6 @@ function Panel() {
       .catch(error => {
         console.error('Error al obtener datos de la API de empleados:', error);
       });
-  };
-
-  const handlePageChange = (setPage, pageNumber) => {
-    setPage(pageNumber);
-  };
-
-  const paginar = (datos, paginaActual) => {
-    const startIndex = (paginaActual - 1) * registrosPorPagina;
-    const endIndex = startIndex + registrosPorPagina;
-    return datos.slice(startIndex, endIndex);
-  };
-
-  const ordenesPaginadas = paginar(ordenes, ordenesPagina);
-  const empleadosPaginados = paginar(empleados, empleadosPagina);
-
-  const renderPagination = (items, currentPage, setPage) => {
-    const totalPages = Math.ceil(items.length / registrosPorPagina);
-    const paginationItems = [];
-    for (let number = 1; number <= totalPages; number++) {
-      paginationItems.push(
-        <Pagination.Item key={number} active={number === currentPage} onClick={() => handlePageChange(setPage, number)}>
-          {number}
-        </Pagination.Item>
-      );
-    }
-    return (
-      <Pagination>{paginationItems}</Pagination>
-    );
   };
 
   return (
@@ -115,7 +83,7 @@ function Panel() {
             <li>
               <div className="iconosbarra">
                 <IoMdSettings size={20} />
-                <Link to="/Ajustes" className="nav-link">Contraseñas</Link>
+                <Link to="/Ajustes" className="nav-link">Ajustes</Link>
               </div>
             </li>
             <li>
@@ -132,8 +100,8 @@ function Panel() {
               <h1 className="text-center mt-4">Panel de empleado</h1>
               <p className="lead text-center">Las más recientes órdenes listas</p>
               <div className="table-container">
-                <Table striped bordered hover>
-                  <thead className="table-primary">
+                <table className="table table1">
+                  <thead>
                     <tr>
                       <th>ID</th>
                       <th>Estado</th>
@@ -144,7 +112,7 @@ function Panel() {
                     </tr>
                   </thead>
                   <tbody>
-                    {ordenesPaginadas.map((orden) => (
+                    {ordenes.map((orden) => (
                       <tr key={orden.orderID}>
                         <td>{orden.orderID}</td>
                         <td>{orden.estado}</td>
@@ -155,8 +123,7 @@ function Panel() {
                       </tr>
                     ))}
                   </tbody>
-                </Table>
-                {ordenes.length > registrosPorPagina && renderPagination(ordenes, ordenesPagina, setOrdenesPagina)}
+                </table>
               </div>
             </div>
             <div>
@@ -166,7 +133,7 @@ function Panel() {
                   Personal Estado
                 </div>
                 <div className="card-body">
-                  <Table striped bordered hover>
+                  <table className="table">
                     <thead>
                       <tr>
                         <th>Nombre</th>
@@ -174,19 +141,14 @@ function Panel() {
                       </tr>
                     </thead>
                     <tbody>
-                      {empleadosPaginados.map((empleado, index) => (
+                      {empleados.map((empleado, index) => (
                         <tr key={index}>
                           <td>{empleado.username}</td>
-                          <td>
-                            <span className={empleado.status ? "badge bg-success" : "badge bg-danger"}>
-                              {empleado.status ? "Online" : "Offline"}
-                            </span>
-                          </td>
+                          <td>{empleado.status}</td>
                         </tr>
                       ))}
                     </tbody>
-                  </Table>
-                  {empleados.length > registrosPorPagina && renderPagination(empleados, empleadosPagina, setEmpleadosPagina)}
+                  </table>
                 </div>
               </div>
             </div>

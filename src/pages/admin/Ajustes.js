@@ -8,14 +8,10 @@ import { MdEventAvailable } from "react-icons/md";
 import { IoPersonCircle } from "react-icons/io5";
 import { MdTableRestaurant } from "react-icons/md";
 import { Link } from "react-router-dom";
-import { Table, Form, Button, Container, Row, Col, Pagination } from 'react-bootstrap';
 
 function Ajustes() {
   const [users, setUsers] = useState([]);
   const [newPasswords, setNewPasswords] = useState({});
-  const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [usersPerPage] = useState(10);
 
   useEffect(() => {
     axios
@@ -64,28 +60,8 @@ function Ajustes() {
       });
   };
 
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
-  };
-
-  const filteredUsers = users.filter((user) =>
-    user.username.toLowerCase().includes(search.toLowerCase())
-  );
-
-  // Paginación
-  const indexOfLastUser = currentPage * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  const pageNumbers = [];
-  for (let i = 1; i <= Math.ceil(filteredUsers.length / usersPerPage); i++) {
-    pageNumbers.push(i);
-  }
-
   return (
-    <div className="container-fluid">
+    <div className="container">
       <header className="navbar">
         <h1>Placeres del mar | OrdenBrivs</h1>
       </header>
@@ -97,66 +73,43 @@ function Ajustes() {
             <SidebarItem icon={<MdEventAvailable size={20} />} to="/Ventas" text="Ventas" />
             <SidebarItem icon={<IoPersonCircle size={20} />} to="/adminusuarios" text="Empleados" />
             <SidebarItem icon={<MdTableRestaurant size={20} />} to="/Mesa" text="Mesas" />
-            <SidebarItem icon={<IoMdSettings size={20} />} to="/Ajustes" text="Contraseñas" />
+            <SidebarItem icon={<IoMdSettings size={20} />} to="/Ajustes" text="Ajustes" />
             <SidebarItem icon={<FaPowerOff size={20} />} to="/inicio" text="Cerrar sesión" />
           </ul>
         </div>
-        <div className="content">
-          <Container fluid className="mt-4">
-            <Row className="mb-3">
-              <Col md={6}>
-                <h2>Usuarios</h2>
-              </Col>
-              <Col md={6}>
-                <Form.Control
-                  type="text"
-                  placeholder="Buscar usuario"
-                  value={search}
-                  onChange={handleSearch}
-                />
-              </Col>
-            </Row>
-            <Table striped bordered hover>
-              <thead>
-                <tr>
-                  <th>Staff ID</th>
-                  <th>Nombre de Usuario</th>
-                  <th>Rol</th>
-                  <th>Nueva Contraseña</th>
-                  <th>Cambiar Contraseña</th>
+        <div className="user-table content">
+          <h2>Usuarios</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Staff ID</th>
+                <th>Nombre de Usuario</th>
+                <th>Rol</th>
+                <th>Nueva Contraseña</th>
+                <th>Cambiar Contraseña</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user) => (
+                <tr key={user.staffID}>
+                  <td>{user.staffID}</td>
+                  <td>{user.username}</td>
+                  <td>{user.role}</td>
+                  <td>
+                    <input
+                      type="password"
+                      placeholder="Escribe la nueva contraseña"
+                      value={newPasswords[user.staffID]}
+                      onChange={(e) => handleInputChange(e, user.staffID)}
+                    />
+                  </td>
+                  <td>
+                    <button onClick={(e) => handleSubmit(e, user.staffID)}>Cambiar Contraseña</button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {currentUsers.map((user) => (
-                  <tr key={user.staffID}>
-                    <td>{user.staffID}</td>
-                    <td>{user.username}</td>
-                    <td>{user.role}</td>
-                    <td>
-                      <Form.Control
-                        type="password"
-                        placeholder="Escribe la nueva contraseña"
-                        value={newPasswords[user.staffID]}
-                        onChange={(e) => handleInputChange(e, user.staffID)}
-                      />
-                    </td>
-                    <td>
-                      <Button variant="primary" onClick={(e) => handleSubmit(e, user.staffID)}>
-                        Cambiar Contraseña
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-            <Pagination>
-              {pageNumbers.map(number => (
-                <Pagination.Item key={number} active={number === currentPage} onClick={() => paginate(number)}>
-                  {number}
-                </Pagination.Item>
               ))}
-            </Pagination>
-          </Container>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -175,3 +128,4 @@ const SidebarItem = ({ icon, to, text }) => (
 );
 
 export default Ajustes;
+

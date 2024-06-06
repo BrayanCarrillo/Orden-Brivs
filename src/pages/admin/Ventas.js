@@ -10,7 +10,6 @@ import { MdTableRestaurant } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
 import { FaPowerOff } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { Table, Pagination } from 'react-bootstrap';
 
 function Ventas() {
     const [ventasData, setVentasData] = useState({
@@ -21,21 +20,15 @@ function Ventas() {
         ordenes: []
     });
 
-    const [mesaDetalles, setMesaDetalles] = useState([]);
-    const [ordenesPage, setOrdenesPage] = useState(1);
-    const [mesaPage, setMesaPage] = useState(1);
-    const registrosPorPagina = 10;
-
     useEffect(() => {
         async function fetchVentasData() {
             try {
-                const [hoyResp, semanaResp, mesResp, todoElTiempoResp, ordenesResp, mesaDetallesResp] = await Promise.all([
+                const [hoyResp, semanaResp, mesResp, todoElTiempoResp, ordenesResp] = await Promise.all([
                     axios.get('http://127.0.0.1:8000/api/ganancias/hoy'),
                     axios.get('http://127.0.0.1:8000/api/ganancias/semana'),
                     axios.get('http://127.0.0.1:8000/api/ganancias/mes'),
                     axios.get('http://127.0.0.1:8000/api/ganancias/todo-el-tiempo'),
-                    axios.get('http://127.0.0.1:8000/api/ordenes'),
-                    axios.get('http://127.0.0.1:8000/api/detalles-mesa'),
+                    axios.get('http://127.0.0.1:8000/api/ordenes'), // Nueva ruta para obtener órdenes
                 ]);
 
                 setVentasData({
@@ -43,11 +36,8 @@ function Ventas() {
                     semana: semanaResp.data.ganancias,
                     mes: mesResp.data.ganancias,
                     todoElTiempo: todoElTiempoResp.data.ganancias,
-                    ordenes: ordenesResp.data.ordenes,
+                    ordenes: ordenesResp.data.ordenes, // Actualizamos las órdenes
                 });
-
-                setMesaDetalles(mesaDetallesResp.data);
-
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -55,38 +45,6 @@ function Ventas() {
 
         fetchVentasData();
     }, []);
-
-    const handleOrdenesPageChange = (pageNumber) => {
-        setOrdenesPage(pageNumber);
-    };
-
-    const handleMesaPageChange = (pageNumber) => {
-        setMesaPage(pageNumber);
-    };
-
-    const paginar = (datos, paginaActual) => {
-        const startIndex = (paginaActual - 1) * registrosPorPagina;
-        const endIndex = startIndex + registrosPorPagina;
-        return datos.slice(startIndex, endIndex);
-    };
-
-    const ordenesPaginadas = paginar(ventasData.ordenes, ordenesPage);
-    const mesaPaginadas = paginar(mesaDetalles, mesaPage);
-
-    const renderPagination = (totalRecords, currentPage, onPageChange) => {
-        const totalPages = Math.ceil(totalRecords / registrosPorPagina);
-        const items = [];
-        for (let number = 1; number <= totalPages; number++) {
-            items.push(
-                <Pagination.Item key={number} active={number === currentPage} onClick={() => onPageChange(number)}>
-                    {number}
-                </Pagination.Item>
-            );
-        }
-        return (
-            <Pagination>{items}</Pagination>
-        );
-    };
 
     return (
         <div>
@@ -129,15 +87,15 @@ function Ventas() {
                         <li>
                             <div className="iconosbarra">
                                 <IoMdSettings size={20} />
-                                <Link to="/Ajustes" className="nav-link">Contraseñas</Link>
+                                <Link to="/Ajustes" className="nav-link">Ajustes</Link>
                             </div>
                         </li>
                         <li>
-                            <div className="iconosbarra">
-                                <FaPowerOff size={20} />
-                                <Link to="/inicio" className="nav-link">Cerrar sesión</Link>
-                            </div>
-                        </li>
+              <div className="iconosbarra">
+                <FaPowerOff size={20} />
+                <Link to="/inicio" className="nav-link">Cerrar sesión</Link>
+              </div>
+            </li>
                     </ul>
                 </div>
                 <div className="content">
@@ -176,7 +134,7 @@ function Ventas() {
                                     <MdAttachMoney size={25} />
                                     <h2>Lista de Órdenes de Ventas</h2>
                                 </div>
-                                <Table striped bordered hover>
+                                <table className="tabla-ventas">
                                     <thead>
                                         <tr>
                                             <th># Orden</th>
@@ -189,7 +147,7 @@ function Ventas() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {ordenesPaginadas.map((orden, index) => (
+                                        {ventasData.ordenes.map((orden, index) => (
                                             <tr key={index}>
                                                 <td>{orden['Numero de Orden']}</td>
                                                 <td>{orden['Menu']}</td>
@@ -201,34 +159,7 @@ function Ventas() {
                                             </tr>
                                         ))}
                                     </tbody>
-                                </Table>
-                                {renderPagination(ventasData.ordenes.length, ordenesPage, handleOrdenesPageChange)}
-
-                                <div className="icono-titulo">
-                                    <MdAttachMoney size={25} />
-                                    <h2>Detalles de Mesas</h2>
-                                </div>
-                                <Table striped bordered hover>
-                                    <thead>
-                                        <tr>
-                                            <th>Nombre del Staff</th>
-                                            <th>ID de la Mesa</th>
-                                            <th>Nombre del Plato</th>
-                                            <th>Total (COP)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {mesaPaginadas.map((detalle, index) => (
-                                            <tr key={index}>
-                                                <td>{detalle.staff_name}</td>
-                                                <td>{detalle.mesaID}</td>
-                                                <td>{detalle.menuItemName}</td>
-                                                <td>{detalle.total}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </Table>
-                                {renderPagination(mesaDetalles.length, mesaPage, handleMesaPageChange)}
+                                </table>
                             </div>
                         </div>
                     </div>
