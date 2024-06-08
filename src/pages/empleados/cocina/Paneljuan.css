@@ -71,61 +71,59 @@ body {
   overflow-x: auto;
 }
 
-.order-table {
+.table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
 }
 
-.order-table th,
-.order-table td {
+.table th,
+.table td {
   border: 1px solid #ddd;
-  padding: 15px;
+  padding: 20px;
   text-align: left;
 }
 
-.order-table th {
-  background-color: #f2f2f2;
-  color: #333;
+.table th {
+  background-color: white;
+  color: rgb(4, 4, 4);
   font-weight: bold;
 }
 
-.order-table td:last-child,
-.order-table th:last-child {
-  text-align: center;
+.table td:last-child,
+.table th:last-child {
+  text-align: left;
 }
 
 /* Estilos de resaltado al pasar el cursor sobre las filas */
-.order-table tbody tr:hover {
-  background-color: #f5f5f5;
+.table tbody tr:hover {
+  background-color: #cce5ff;
   cursor: pointer;
 }
 
+/* Estilos específicos para cada tabla */
+.table1 {
+  background-color: white;
+}
+
+.table2 {
+  background-color: white;
+}
+
 /* Estilos de los botones */
-.order-table button {
+.btn {
   padding: 5px 10px;
-  margin-right: 5px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
 }
 
-.preparando-btn {
-  background-color: #ffc107;
-  color: #333;
-}
-
-.listo-btn {
-  background-color: #28a745;
+.btn-success {
+  background-color: green;
   color: white;
 }
 
-.cancelar-btn {
-  background-color: #dc3545;
-  color: white;
-}
-
-.limpiar-btn {
-  background-color: #6c757d;
+.btn-danger {
+  background-color: red;
   color: white;
 }

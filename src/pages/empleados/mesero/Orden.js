@@ -96,7 +96,7 @@ function MenuComponent() {
   
 
   return (
-    <div className="container">
+    <div>
       <header className="navbar">
         <h1>Placeres del mar | OrdenBrivs</h1>
       </header>

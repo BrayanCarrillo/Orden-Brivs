@@ -1,48 +1,28 @@
-import React, { lazy, Suspense } from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-// Importar componentes con lazy loading
-const Inicio = lazy(() => import('./pages/inicio'));
-const Login = lazy(() => import('./pages/Login'));
-const Panel = lazy(() => import('./pages/admin/panel'));
-const AdminUsuarios = lazy(() => import('./pages/admin/adminusuarios'));
-const Ajustes = lazy(() => import('./pages/admin/Ajustes'));
-const Categoria = lazy(() => import('./pages/admin/Categoria'));
-const Mesa = lazy(() => import('./pages/admin/Mesa'));
-const Ventas = lazy(() => import('./pages/admin/Ventas'));
-const Paneljuan = lazy(() => import('./pages/empleados/cocina/Paneljuan'));
-const Panelcocina = lazy(() => import('./pages/empleados/cocina/Panelcocina'));
-const Ajustesjuan = lazy(() => import('./pages/empleados/cocina/Ajustesjuan'));
-const PanelPedro = lazy(() => import('./pages/empleados/mesero/PanelPedro'));
-const Orden = lazy(() => import('./pages/empleados/mesero/Orden'));
-const AjustesPedro = lazy(() => import('./pages/empleados/mesero/AjustesPedro'));
+import Inicio from './pages/inicio';
+import Login from './pages/Login';
+import Panel from './pages/admin/panel';
+import AdminUsuarios from './pages/admin/adminusuarios';
+import Ajustes from './pages/admin/Ajustes';
+import Categoria from './pages/admin/Categoria';
+import Mesa from './pages/admin/Mesa';
+import Ventas from './pages/admin/Ventas';
+import Paneljuan from './pages/empleados/cocina/Paneljuan';
+import Panelcocina from './pages/empleados/cocina/Panelcocina';
+import Ajustesjuan from './pages/empleados/cocina/Ajustesjuan';
+import PanelPedro from './pages/empleados/mesero/PanelPedro';
+import Orden from './pages/empleados/mesero/Orden';
+import AjustesPedro from './pages/empleados/mesero/AjustesPedro';
+import Avanzado from './pages/admin/avanzado'; 
+
 
 function App() {
   return (
     <Router>
-      <Suspense fallback={
-        <div className="loading">
-          <div aria-label="Orange and tan hamster running in a metal wheel" role="img" className="wheel-and-hamster">
-            <div className="wheel"></div>
-            <div className="hamster">
-              <div className="hamster__body">
-                <div className="hamster__head">
-                  <div className="hamster__ear"></div>
-                  <div className="hamster__eye"></div>
-                  <div className="hamster__nose"></div>
-                </div>
-                <div className="hamster__limb hamster__limb--fr"></div>
-                <div className="hamster__limb hamster__limb--fl"></div>
-                <div className="hamster__limb hamster__limb--br"></div>
-                <div className="hamster__limb hamster__limb--bl"></div>
-                <div className="hamster__tail"></div>
-              </div>
-            </div>
-            <div className="spoke"></div>
-          </div>
-        </div>
-      }>
+      <Suspense fallback={<div className="loading">Loading...</div>}>
         <Routes>
           <Route exact path="/" element={<Inicio />} />
           <Route path="/Login" element={<Login />} />
@@ -59,7 +39,8 @@ function App() {
           <Route path="/Orden" element={<Orden />} />
           <Route path="/AjustesPedro" element={<AjustesPedro />} />
           <Route path="/inicio" element={<Inicio />} />
-          {/* Agrega otras rutas */}
+          <Route path="/avanzado" element={<Avanzado />} /> 
+
         </Routes>
       </Suspense>
     </Router>

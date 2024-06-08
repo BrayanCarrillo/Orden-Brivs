@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { AiFillControl } from "react-icons/ai";
+import { FiDatabase } from "react-icons/fi";
 import { MdOutlineRestaurant } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
 import { FaPowerOff } from "react-icons/fa";
@@ -8,12 +9,17 @@ import { IoPersonCircle } from "react-icons/io5";
 import { MdTableRestaurant } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { Table, Pagination, Alert, Button } from 'react-bootstrap';
 import "./adminusuarios.css";
 
 function AdminUsuarios() {
   const [users, setUsers] = useState([]);
   const [newUserName, setNewUserName] = useState('');
   const [newUserRole, setNewUserRole] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showDishAlert, setShowDishAlert] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+  const registrosPorPagina = 10;
 
   useEffect(() => {
     fetchUsers();
@@ -31,10 +37,10 @@ function AdminUsuarios() {
   const handleAgregarEmpleado = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/api/empleados', { 
+      await axios.post('http://localhost:8000/api/empleados', { 
         username: newUserName,
-        status: 'activo',
-        role: newUserRole.toLowerCase(), // Convertir a minúsculas
+        status: true,
+        role: newUserRole.toLowerCase(),
         password: '1234abcd'
       });
       fetchUsers();
@@ -45,75 +51,126 @@ function AdminUsuarios() {
     }
   };
 
-  const handleEliminarEmpleado = async (id) => {
+  const handleEliminarEmpleado = async () => {
     try {
-      await axios.delete(`http://localhost:8000/api/empleados/${id}`);
+      await axios.delete(`http://localhost:8000/api/empleados/${userToDelete.staffID}`);
       fetchUsers();
     } catch (error) {
       console.error('Error deleting user:', error);
     }
+    setShowDishAlert(false);
+    setUserToDelete(null);
   };
 
   const handleActualizarRol = async (id, newRole) => {
     try {
-      await axios.put(`http://localhost:8000/api/empleados/${id}/rol`, { role: newRole.toLowerCase() }); // Convertir a minúsculas
+      await axios.put(`http://localhost:8000/api/empleados/${id}/rol`, { role: newRole.toLowerCase() });
       fetchUsers();
     } catch (error) {
       console.error('Error updating role:', error);
     }
   };
 
+  const handleToggleEstadoEmpleado = async (id, status) => {
+    try {
+      const newStatus = !status;
+      await axios.put(`http://localhost:8000/api/empleados/${id}/estado`, { status: newStatus });
+      fetchUsers();
+    } catch (error) {
+      console.error('Error toggling employee status:', error);
+    }
+  };
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const paginar = (datos, paginaActual) => {
+    const startIndex = (paginaActual - 1) * registrosPorPagina;
+    const endIndex = startIndex + registrosPorPagina;
+    return datos.slice(startIndex, endIndex);
+  };
+
+  const usuariosPaginados = paginar(users, currentPage);
+
+  const renderPagination = () => {
+    const totalPages = Math.ceil(users.length / registrosPorPagina);
+    const items = [];
+    for (let number = 1; number <= totalPages; number++) {
+      items.push(
+        <Pagination.Item key={number} active={number === currentPage} onClick={() => handlePageChange(number)}>
+          {number}
+        </Pagination.Item>
+      );
+    }
+    return (
+      <Pagination>{items}</Pagination>
+    );
+  };
+
+  const showDeleteAlert = (user) => {
+    setUserToDelete(user);
+    setShowDishAlert(true);
+  };
+
   return (
     <div className="app-container">
-       <header className="navbar">
+      <header className="navbar">
         <h1>Placeres del mar | OrdenBrivs</h1>
       </header>
       <div className="wrapper">
         <div className="sidebar">
-          <ul>
-            <li>
-              <div className="iconosbarra">
-                <AiFillControl size={20} />
-                <Link to="/panel" className="nav-link">Panel de Control</Link>
-              </div>
-            </li>
-            <li>
-              <div className="iconosbarra">
-                <MdOutlineRestaurant size={20} />
-                <Link to="/Categoria" className="nav-link">Menú</Link>
-              </div>
-            </li>
-            <li>
-              <div className="iconosbarra">
-                <MdEventAvailable size={20} />
-                <Link to="/Ventas" className="nav-link">Ventas</Link>
-              </div>
-            </li>
-            <li>
-              <div className="iconosbarra">
-                <IoPersonCircle size={20} />
-                <Link to="/adminusuarios" className="nav-link">Empleados</Link>
-              </div>
-            </li>
-            <li>
-              <div className="iconosbarra">
-                <MdTableRestaurant size={20} />
-                <Link to="/Mesa" className="nav-link">Mesas</Link>
-              </div>
-            </li>
-            <li>
-              <div className="iconosbarra">
-                <IoMdSettings size={20} />
-                <Link to="/Ajustes" className="nav-link">Ajustes</Link>
-              </div>
-            </li>
-            <li>
-              <div className="iconosbarra">
-                <FaPowerOff size={20} />
-                <Link to="/inicio" className="nav-link">Cerrar sesión</Link>
-              </div>
-            </li>
-          </ul>
+        <ul>
+                        <li>
+                            <div className="iconosbarra">
+                                <AiFillControl size={20} />
+                                <Link to="/panel" className="nav-link">Panel de Control</Link>
+                            </div>
+                        </li>
+                        <li>
+                            <div className="iconosbarra">
+                                <MdOutlineRestaurant size={20} />
+                                <Link to="/Categoria" className="nav-link">Menú</Link>
+                            </div>
+                        </li>
+                        <li>
+                            <div className="iconosbarra">
+                                <MdEventAvailable size={20} />
+                                <Link to="/Ventas" className="nav-link">Ventas</Link>
+                            </div>
+                        </li>
+                        <li>
+                            <div className="iconosbarra">
+                                <IoPersonCircle size={20} />
+                                <Link to="/adminusuarios" className="nav-link">Empleados</Link>
+                            </div>
+                        </li>
+                        <li>
+                            <div className="iconosbarra">
+                                <MdTableRestaurant size={20} />
+                                <Link to="/Mesa" className="nav-link">Mesas</Link>
+                            </div>
+                        </li>
+                        <li>
+                            <div className="iconosbarra">
+                                <IoMdSettings size={20} />
+                                <Link to="/Ajustes" className="nav-link">Contraseñas</Link>
+                            </div>
+                        </li>
+                        <li>
+                        <li>
+                            <div className="iconosbarra">
+                                <FiDatabase size={20} />
+                                <Link to="/avanzado" className="nav-link">Copia de seguridad</Link>
+                            </div>
+                        </li>
+                            <div className="iconosbarra">
+                                <FaPowerOff size={20} />
+                                <Link to="/inicio" className="nav-link">Cerrar sesión</Link>
+                            </div>
+                        </li>
+
+                    </ul>
         </div>
         <div className="content">
           <div id="page-content-wrapper" className="content-wrapper">
@@ -126,7 +183,7 @@ function AdminUsuarios() {
                     <p>Lista Actual de Empleados</p>
                   </div>
                   <div className="table-responsive">
-                    <table className="order-table">
+                    <Table striped bordered hover>
                       <thead className="table-primary">
                         <tr>
                           <th>#</th>
@@ -137,11 +194,11 @@ function AdminUsuarios() {
                         </tr>
                       </thead>
                       <tbody>
-                        {users.map((user) => (
+                        {usuariosPaginados.map((user) => (
                           <tr key={user.staffID}>
                             <td>{user.staffID}</td>
                             <td>{user.username}</td>
-                            <td>{user.status}</td>
+                            <td>{user.status ? "Activo" : "Inactivo"}</td>
                             <td>
                               <select className="form-select" value={user.role} onChange={(e) => handleActualizarRol(user.staffID, e.target.value)}>
                                 <option value="mesero">Mesero</option>
@@ -149,12 +206,24 @@ function AdminUsuarios() {
                               </select>
                             </td>
                             <td>
-                              <button className="btn btn-danger" onClick={() => handleEliminarEmpleado(user.staffID)}>Eliminar</button>
+                              <button
+                                className={user.status ? "btn btn-secondary" : "btn btn-success"}
+                                onClick={() => handleToggleEstadoEmpleado(user.staffID, user.status)}
+                              >
+                                {user.status ? "Desactivar" : "Activar"}
+                              </button>
+                              <button
+                                className="btn btn-danger"
+                                onClick={() => showDeleteAlert(user)}
+                              >
+                                Eliminar
+                              </button>
                             </td>
                           </tr>
                         ))}
                       </tbody>
-                    </table>
+                    </Table>
+                    {renderPagination()}
                   </div>
                 </div>
               </div>
@@ -190,6 +259,21 @@ function AdminUsuarios() {
           </div>
         </div>
       </div>
+      <Alert show={showDishAlert} variant="danger" className="alert-fixed">
+        <Alert.Heading>¡Atención!</Alert.Heading>
+        <p>
+          ¿Estás seguro de que deseas eliminar este usuario? Esta acción no se podrá deshacer y podría afectar tus consultas.
+        </p>
+        <hr />
+        <div className="d-flex justify-content-end">
+          <Button onClick={() => setShowDishAlert(false)} variant="success">
+            Cancelar
+          </Button>
+          <Button onClick={handleEliminarEmpleado} variant="danger" className="ms-2">
+            Borrar
+          </Button>
+        </div>
+      </Alert>
     </div>
   );
 }

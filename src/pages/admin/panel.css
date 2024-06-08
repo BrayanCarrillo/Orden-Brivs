@@ -1,5 +1,6 @@
 /* panel.css */
 
+/* Estilos generales */
 body {
   margin: 0;
   padding: 0;
@@ -22,7 +23,7 @@ body {
 .iconosbarra {
   display: flex;
   align-items: center;
-  color:#8e8b8b
+  color: #8e8b8b;
 }
 
 .wrapper {
@@ -66,6 +67,7 @@ body {
   margin-bottom: 20px;
 }
 
+/* Estilos para las tablas */
 .table-container {
   overflow-x: auto;
 }
@@ -73,14 +75,12 @@ body {
 .table {
   width: 100%;
   border-collapse: collapse;
-  border: 2px solid #f7f7f7;
-  background-color: #e6f7ff;
 }
 
 .table th,
 .table td {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 20px; /* Ajusta el espacio interior de las celdas */
   text-align: left;
 }
 
@@ -92,3 +92,4 @@ body {
 .table td:last-child {
   text-align: center;
 }
+
