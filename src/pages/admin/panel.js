@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import './panel.css';
 import { AiFillControl } from "react-icons/ai";
 import { FiDatabase } from "react-icons/fi";
@@ -10,25 +10,46 @@ import { IoPersonCircle } from "react-icons/io5";
 import { MdTableRestaurant } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { Table, Pagination } from 'react-bootstrap';
+import { Table, Pagination, Button, Badge } from 'react-bootstrap';
 
 function Panel() {
   const [ordenes, setOrdenes] = useState([]);
   const [empleados, setEmpleados] = useState([]);
   const [ordenesPagina, setOrdenesPagina] = useState(1);
   const [empleadosPagina, setEmpleadosPagina] = useState(1);
+  const [newReadyOrdersCount, setNewReadyOrdersCount] = useState(0);
+  const [soundEnabled, setSoundEnabled] = useState(false);
   const registrosPorPagina = 5;
+  const audioRef = useRef(new Audio('notification.mp3'));
 
   useEffect(() => {
     fetchOrdenesListas();
     fetchEmpleados();
+    const interval = setInterval(fetchOrdenesListas, 3000); // Update every 3 seconds
+    return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (soundEnabled && newReadyOrdersCount > 0) {
+      audioRef.current.play().catch(error => {
+        console.log('Error playing notification sound:', error);
+      });
+    }
+  }, [newReadyOrdersCount, soundEnabled]);
 
   const fetchOrdenesListas = async () => {
     try {
       const response = await fetch('http://127.0.0.1:8000/api/ordenes/listas');
       const data = await response.json();
-      setOrdenes(data.ordenes);
+      const newReadyOrders = data.ordenes.filter(order => order.estado === 'listo');
+
+      if (newReadyOrders.length > ordenes.filter(order => order.estado === 'listo').length) {
+        setNewReadyOrdersCount(newReadyOrders.length);
+      } else {
+        setNewReadyOrdersCount(0);
+      }
+
+      setOrdenes(newReadyOrders);
     } catch (error) {
       console.error('Error al obtener las órdenes:', error);
     }
@@ -42,6 +63,17 @@ function Panel() {
       .catch(error => {
         console.error('Error al obtener datos de la API de empleados:', error);
       });
+  };
+
+  const toggleSound = () => {
+    setSoundEnabled(prevSoundEnabled => {
+      if (!prevSoundEnabled) {
+        audioRef.current.play().catch(error => {
+          console.log('Error playing audio: User interaction required.', error);
+        });
+      }
+      return !prevSoundEnabled;
+    });
   };
 
   const handlePageChange = (setPage, pageNumber) => {
@@ -82,63 +114,68 @@ function Panel() {
       </header>
       <div className="wrapper">
         <div className="sidebar">
-        <ul>
-                        <li>
-                            <div className="iconosbarra">
-                                <AiFillControl size={20} />
-                                <Link to="/panel" className="nav-link">Panel de Control</Link>
-                            </div>
-                        </li>
-                        <li>
-                            <div className="iconosbarra">
-                                <MdOutlineRestaurant size={20} />
-                                <Link to="/Categoria" className="nav-link">Menú</Link>
-                            </div>
-                        </li>
-                        <li>
-                            <div className="iconosbarra">
-                                <MdEventAvailable size={20} />
-                                <Link to="/Ventas" className="nav-link">Ventas</Link>
-                            </div>
-                        </li>
-                        <li>
-                            <div className="iconosbarra">
-                                <IoPersonCircle size={20} />
-                                <Link to="/adminusuarios" className="nav-link">Empleados</Link>
-                            </div>
-                        </li>
-                        <li>
-                            <div className="iconosbarra">
-                                <MdTableRestaurant size={20} />
-                                <Link to="/Mesa" className="nav-link">Mesas</Link>
-                            </div>
-                        </li>
-                        <li>
-                            <div className="iconosbarra">
-                                <IoMdSettings size={20} />
-                                <Link to="/Ajustes" className="nav-link">Contraseñas</Link>
-                            </div>
-                        </li>
-                        <li>
-                        <li>
-                            <div className="iconosbarra">
-                                <FiDatabase size={20} />
-                                <Link to="/avanzado" className="nav-link">Copia de seguridad</Link>
-                            </div>
-                        </li>
-                            <div className="iconosbarra">
-                                <FaPowerOff size={20} />
-                                <Link to="/inicio" className="nav-link">Cerrar sesión</Link>
-                            </div>
-                        </li>
-
-                    </ul>
+          <ul>
+            <li>
+              <div className="iconosbarra">
+                <AiFillControl size={20} />
+                <Link to="/panel" className="nav-link">Panel de Control</Link>
+              </div>
+            </li>
+            <li>
+              <div className="iconosbarra">
+                <MdOutlineRestaurant size={20} />
+                <Link to="/Categoria" className="nav-link">Menú</Link>
+              </div>
+            </li>
+            <li>
+              <div className="iconosbarra">
+                <MdEventAvailable size={20} />
+                <Link to="/Ventas" className="nav-link">Ventas</Link>
+              </div>
+            </li>
+            <li>
+              <div className="iconosbarra">
+                <IoPersonCircle size={20} />
+                <Link to="/adminusuarios" className="nav-link">Empleados</Link>
+              </div>
+            </li>
+            <li>
+              <div className="iconosbarra">
+                <MdTableRestaurant size={20} />
+                <Link to="/Mesa" className="nav-link">Mesas</Link>
+              </div>
+            </li>
+            <li>
+              <div className="iconosbarra">
+                <IoMdSettings size={20} />
+                <Link to="/Ajustes" className="nav-link">Contraseñas</Link>
+              </div>
+            </li>
+            <li>
+              <div className="iconosbarra">
+                <FiDatabase size={20} />
+                <Link to="/avanzado" className="nav-link">Copia de seguridad</Link>
+              </div>
+            </li>
+            <li>
+              <div className="iconosbarra">
+                <FaPowerOff size={20} />
+                <Link to="/inicio" className="nav-link">Cerrar sesión</Link>
+              </div>
+            </li>
+          </ul>
         </div>
         <div className="container">
           <div className="content">
             <div className="page-title">
               <h1 className="text-center mt-4">Panel de empleado</h1>
               <p className="lead text-center">Las más recientes órdenes listas</p>
+              <Button onClick={toggleSound}>
+                {soundEnabled ? 'Deshabilitar sonido de notificación' : 'Habilitar sonido de notificación'}
+              </Button>
+              <div className="order-counter mt-3">
+                <p>Órdenes listas: <Badge variant="secondary">{ordenes.filter(order => order.estado === 'listo').length}</Badge></p>
+              </div>
               <div className="table-container">
                 <Table striped bordered hover>
                   <thead className="table-primary">

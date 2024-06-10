@@ -1,14 +1,21 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { AiFillControl } from "react-icons/ai";
-import { Link } from "react-router-dom";
-import { MdRestaurant } from "react-icons/md";
-import { IoMdSettings } from "react-icons/io";
-import { FaPowerOff } from "react-icons/fa";
+import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
+import { Table, Button, Pagination, Badge } from 'react-bootstrap';
+import { AiFillControl } from 'react-icons/ai';
+import { Link } from 'react-router-dom';
+import { MdRestaurant } from 'react-icons/md';
+import { FaPowerOff } from 'react-icons/fa';
 import './Panelcocina.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function Panelcocina() {
   const [orders, setOrders] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [waitingOrderCount, setWaitingOrderCount] = useState(0);
+  const [newWaitingOrderCount, setNewWaitingOrderCount] = useState(0);
+  const itemsPerPage = 5;
+  const audioRef = useRef(new Audio('notification.mp3'));
 
   useEffect(() => {
     fetchOrders();
@@ -16,18 +23,30 @@ function Panelcocina() {
     return () => clearInterval(interval); // Limpiar el intervalo al desmontar el componente
   }, []);
 
+  useEffect(() => {
+    if (soundEnabled && newWaitingOrderCount > 0) {
+      audioRef.current.play().catch(error => {
+        console.log('Error playing notification sound:', error);
+      });
+    }
+  }, [newWaitingOrderCount, soundEnabled]);
+
   const fetchOrders = async () => {
     try {
       const response = await axios.get('http://127.0.0.1:8000/api/chef/all-orders');
       const allOrders = response.data.orders;
-
-      // Filtrar las órdenes que tienen al menos un detalle
       const ordersWithDetails = allOrders.filter(order => order.orderDetails.length > 0);
+      const newWaitingOrders = ordersWithDetails.filter(order => order.orderDetails.some(detail => detail.estado === 'esperando'));
 
-      // Limitar la cantidad de órdenes a mostrar a 10 órdenes
-      const limitedOrders = ordersWithDetails.slice(0, 10);
+      // Verificar si hay nuevas órdenes con estado "esperando"
+      if (newWaitingOrders.length > waitingOrderCount) {
+        setNewWaitingOrderCount(newWaitingOrders.length - waitingOrderCount);
+      } else {
+        setNewWaitingOrderCount(0); // Reset count if no new waiting orders
+      }
 
-      setOrders(limitedOrders);
+      setOrders(ordersWithDetails);
+      setWaitingOrderCount(newWaitingOrders.length); // Actualizar el contador de órdenes "esperando"
     } catch (error) {
       console.error('Error fetching orders:', error);
     }
@@ -51,6 +70,30 @@ function Panelcocina() {
     }
   };
 
+  const toggleSound = () => {
+    setSoundEnabled(prevSoundEnabled => {
+      if (!prevSoundEnabled) {
+        audioRef.current.play().catch(error => {
+          console.log('Error playing audio: User interaction required.', error);
+        });
+      }
+      return !prevSoundEnabled;
+    });
+  };
+
+  // Filtrar órdenes según el estado
+  const filteredOrders = orders.flatMap(order => order.orderDetails.filter(detail => detail.estado !== 'listo'));
+
+  // Paginación
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentOrders = filteredOrders.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <div>
       <header className="navbar">
@@ -61,13 +104,13 @@ function Panelcocina() {
           <ul>
             <li>
               <div className="iconosbarra">
-                <AiFillControl size={20} /> {/* Icono de cubiertos */}
+                <AiFillControl size={20} />
                 <Link to="/Paneljuan" className="nav-link">Panel de control</Link>
               </div>
             </li>
             <li>
               <div className="iconosbarra">
-                <MdRestaurant size={20} /> {/* Icono de restaurante */}
+                <MdRestaurant size={20} />
                 <Link to="/Panelcocina" className="nav-link">Cocina</Link>
               </div>
             </li>
@@ -86,8 +129,14 @@ function Panelcocina() {
             </span>
             <h2>Listado de Últimas Órdenes Recibidas</h2>
           </div>
+          <Button onClick={toggleSound}>
+            {soundEnabled ? 'Deshabilitar sonido de notificación' : 'Habilitar sonido de notificación'}
+          </Button>
+          <div className="order-counter mt-3">
+            <p>Órdenes esperando: <Badge variant="secondary">{waitingOrderCount}</Badge></p>
+          </div>
           <div className="table-container">
-            <table className="order-table">
+            <Table striped bordered hover>
               <thead>
                 <tr>
                   <th>ID</th>
@@ -99,35 +148,44 @@ function Panelcocina() {
                 </tr>
               </thead>
               <tbody>
-                {orders.map(order => (
-                  order.orderDetails.map(detail => (
-                    <tr key={detail['ID de orden']}>
-                      <td>{detail['ID de orden']}</td>
-                      <td>{detail.menu}</td>
-                      <td>{detail.menuItemName}</td>
-                      <td>{detail.cantidad}</td>
-                      <td>{detail.estado}</td>
-                      <td>
-                        {detail.estado === 'esperando' && (
-                          <>
-                            <button className="preparando-btn" onClick={() => handleUpdateStatus(detail['ID de orden'], 'preparando')}>Preparando</button>
-                            <button className="cancelar-btn" onClick={() => handleUpdateStatus(detail['ID de orden'], 'cancelado')}>Cancelar</button>
-                          </>
-                        )}
-                        {detail.estado === 'preparando' && (
-                          <button className="listo-btn" onClick={() => handleUpdateStatus(detail['ID de orden'], 'listo')}>Listo</button>
-                        )}
-                        {detail.estado === 'listo' && (
-                          <button className="cancelar-btn" onClick={() => handleUpdateStatus(detail['ID de orden'], 'cancelado')}>Cancelar</button>
-                        )}
-                        <button className="limpiar-btn" onClick={() => handleDeleteOrder(detail['ID de orden'])}>Limpiar</button>
-                      </td>
-                    </tr>
-                  ))
-                ))}
+                {currentOrders.length > 0 ? currentOrders.map(detail => (
+                  <tr key={detail['ID de orden']}>
+                    <td>{detail['ID de orden']}</td>
+                    <td>{detail.menu}</td>
+                    <td>{detail.menuItemName}</td>
+                    <td>{detail.cantidad}</td>
+                    <td>{detail.estado}</td>
+                    <td>
+                      {detail.estado === 'esperando' && (
+                        <>
+                          <Button variant="warning" size="sm" onClick={() => handleUpdateStatus(detail['ID de orden'], 'preparando')}>Preparando</Button>{' '}
+                          <Button variant="danger" size="sm" onClick={() => handleUpdateStatus(detail['ID de orden'], 'cancelado')}>Cancelar</Button>
+                        </>
+                      )}
+                      {detail.estado === 'preparando' && (
+                        <Button variant="success" size="sm" onClick={() => handleUpdateStatus(detail['ID de orden'], 'listo')}>Listo</Button>
+                      )}
+                      {detail.estado === 'listo' && (
+                        <Button variant="danger" size="sm" onClick={() => handleUpdateStatus(detail['ID de orden'], 'cancelado')}>Cancelar</Button>
+                      )}
+                      <Button variant="secondary" size="sm" onClick={() => handleDeleteOrder(detail['ID de orden'])}>Limpiar</Button>
+                    </td>
+                  </tr>
+                )) : (
+                  <tr>
+                    <td colSpan="6" className="text-center">No orders available</td>
+                  </tr>
+                )}
               </tbody>
-            </table>
+            </Table>
           </div>
+          <Pagination>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => handlePageChange(i + 1)}>
+                {i + 1}
+              </Pagination.Item>
+            ))}
+          </Pagination>
         </div>
       </div>
     </div>

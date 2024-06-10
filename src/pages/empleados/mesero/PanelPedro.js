@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { AiFillControl } from "react-icons/ai";
 import { MdRestaurant } from "react-icons/md";
 import { FaPowerOff } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 import './PanelPedro.css';
+import { Button, Badge, Table, Pagination } from 'react-bootstrap';
 
 function PanelPedro() {
   const [ordenes, setOrdenes] = useState([]);
@@ -11,16 +12,39 @@ function PanelPedro() {
     { nombre: "Pedro", cargo: "Mesero", estado: "Online" },
     // Agrega más empleados según sea necesario
   ]);
+  const [newReadyOrdersCount, setNewReadyOrdersCount] = useState(0);
+  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const audioRef = useRef(new Audio('notification.mp3'));
 
   useEffect(() => {
     fetchOrdenesListas();
+    const interval = setInterval(fetchOrdenesListas, 3000); // Update every 3 seconds
+    return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (soundEnabled && newReadyOrdersCount > 0) {
+      audioRef.current.play().catch(error => {
+        console.log('Error playing notification sound:', error);
+      });
+    }
+  }, [newReadyOrdersCount, soundEnabled]);
 
   const fetchOrdenesListas = async () => {
     try {
       const response = await fetch('http://127.0.0.1:8000/api/ordenes/listas');
       const data = await response.json();
-      setOrdenes(data.ordenes.slice(0, 5)); // Mostrar como máximo 5 órdenes
+      const newReadyOrders = data.ordenes.filter(order => order.estado === 'listo');
+      
+      if (newReadyOrders.length > ordenes.filter(order => order.estado === 'listo').length) {
+        setNewReadyOrdersCount(newReadyOrders.length);
+      } else {
+        setNewReadyOrdersCount(0);
+      }
+
+      setOrdenes(newReadyOrders);
     } catch (error) {
       console.error('Error al obtener las órdenes:', error);
     }
@@ -31,6 +55,27 @@ function PanelPedro() {
     updatedEmpleados[index].estado = updatedEmpleados[index].estado === "Online" ? "Offline" : "Online";
     setEmpleados(updatedEmpleados);
   };
+
+  const toggleSound = () => {
+    setSoundEnabled(prevSoundEnabled => {
+      if (!prevSoundEnabled) {
+        audioRef.current.play().catch(error => {
+          console.log('Error playing audio: User interaction required.', error);
+        });
+      }
+      return !prevSoundEnabled;
+    });
+  };
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentOrders = ordenes.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(ordenes.length / itemsPerPage);
 
   return (
     <div>
@@ -50,8 +95,14 @@ function PanelPedro() {
             <div className="page-title">
               <h1 className="text-center mt-4">Panel de empleado</h1>
               <p className="lead text-center">Las más recientes órdenes listas</p>
+              <Button onClick={toggleSound}>
+                {soundEnabled ? 'Deshabilitar sonido de notificación' : 'Habilitar sonido de notificación'}
+              </Button>
+              <div className="order-counter mt-3">
+                <p>Órdenes listas: <Badge variant="secondary">{ordenes.filter(order => order.estado === 'listo').length}</Badge></p>
+              </div>
               <div className="table-container">
-                <table className="table">
+                <Table striped bordered hover>
                   <thead>
                     <tr>
                       <th>ID</th>
@@ -63,7 +114,7 @@ function PanelPedro() {
                     </tr>
                   </thead>
                   <tbody>
-                    {ordenes.map((orden) => (
+                    {currentOrders.map((orden) => (
                       <tr key={orden.orderID}>
                         <td>{orden.orderID}</td>
                         <td>{orden.estado}</td>
@@ -74,7 +125,14 @@ function PanelPedro() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                </Table>
+                <Pagination>
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => handlePageChange(i + 1)}>
+                      {i + 1}
+                    </Pagination.Item>
+                  ))}
+                </Pagination>
               </div>
             </div>
             {/* Tabla de personal */}
@@ -83,7 +141,7 @@ function PanelPedro() {
                 Estado
               </div>
               <div className="card-body">
-                <table className="table">
+                <Table striped bordered hover>
                   <thead>
                     <tr>
                       <th>Personal</th>
@@ -107,7 +165,7 @@ function PanelPedro() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                </Table>
               </div>
             </div>
           </div>

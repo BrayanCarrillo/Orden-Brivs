@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { AiFillControl } from "react-icons/ai";
-import { FiDatabase } from "react-icons/fi";
+import { FiDatabase, FiEdit } from "react-icons/fi"; // Import FiEdit
 import { MdOutlineRestaurant } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
 import { FaPowerOff } from "react-icons/fa";
@@ -19,6 +19,8 @@ function AdminUsuarios() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showDishAlert, setShowDishAlert] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+  const [editingUserId, setEditingUserId] = useState(null);
+  const [editingUserName, setEditingUserName] = useState('');
   const registrosPorPagina = 10;
 
   useEffect(() => {
@@ -113,6 +115,28 @@ function AdminUsuarios() {
     setShowDishAlert(true);
   };
 
+  const handleEditUserName = (user) => {
+    setEditingUserId(user.staffID);
+    setEditingUserName(user.username);
+  };
+
+  const handleUpdateUserName = async (id) => {
+    try {
+      await axios.put(`http://localhost:8000/api/empleados/${id}/actualizar-nombre`, { username: editingUserName });
+      fetchUsers();
+      setEditingUserId(null);
+      setEditingUserName('');
+    } catch (error) {
+      console.error('Error updating user name:', error);
+    }
+  };
+
+  const handleKeyDown = (e, id) => {
+    if (e.key === 'Enter') {
+      handleUpdateUserName(id);
+    }
+  };
+
   return (
     <div className="app-container">
       <header className="navbar">
@@ -120,57 +144,56 @@ function AdminUsuarios() {
       </header>
       <div className="wrapper">
         <div className="sidebar">
-        <ul>
-                        <li>
-                            <div className="iconosbarra">
-                                <AiFillControl size={20} />
-                                <Link to="/panel" className="nav-link">Panel de Control</Link>
-                            </div>
-                        </li>
-                        <li>
-                            <div className="iconosbarra">
-                                <MdOutlineRestaurant size={20} />
-                                <Link to="/Categoria" className="nav-link">Menú</Link>
-                            </div>
-                        </li>
-                        <li>
-                            <div className="iconosbarra">
-                                <MdEventAvailable size={20} />
-                                <Link to="/Ventas" className="nav-link">Ventas</Link>
-                            </div>
-                        </li>
-                        <li>
-                            <div className="iconosbarra">
-                                <IoPersonCircle size={20} />
-                                <Link to="/adminusuarios" className="nav-link">Empleados</Link>
-                            </div>
-                        </li>
-                        <li>
-                            <div className="iconosbarra">
-                                <MdTableRestaurant size={20} />
-                                <Link to="/Mesa" className="nav-link">Mesas</Link>
-                            </div>
-                        </li>
-                        <li>
-                            <div className="iconosbarra">
-                                <IoMdSettings size={20} />
-                                <Link to="/Ajustes" className="nav-link">Contraseñas</Link>
-                            </div>
-                        </li>
-                        <li>
-                        <li>
-                            <div className="iconosbarra">
-                                <FiDatabase size={20} />
-                                <Link to="/avanzado" className="nav-link">Copia de seguridad</Link>
-                            </div>
-                        </li>
-                            <div className="iconosbarra">
-                                <FaPowerOff size={20} />
-                                <Link to="/inicio" className="nav-link">Cerrar sesión</Link>
-                            </div>
-                        </li>
-
-                    </ul>
+          <ul>
+            <li>
+              <div className="iconosbarra">
+                <AiFillControl size={20} />
+                <Link to="/panel" className="nav-link">Panel de Control</Link>
+              </div>
+            </li>
+            <li>
+              <div className="iconosbarra">
+                <MdOutlineRestaurant size={20} />
+                <Link to="/Categoria" className="nav-link">Menú</Link>
+              </div>
+            </li>
+            <li>
+              <div className="iconosbarra">
+                <MdEventAvailable size={20} />
+                <Link to="/Ventas" className="nav-link">Ventas</Link>
+              </div>
+            </li>
+            <li>
+              <div className="iconosbarra">
+                <IoPersonCircle size={20} />
+                <Link to="/adminusuarios" className="nav-link">Empleados</Link>
+              </div>
+            </li>
+            <li>
+              <div className="iconosbarra">
+                <MdTableRestaurant size={20} />
+                <Link to="/Mesa" className="nav-link">Mesas</Link>
+              </div>
+            </li>
+            <li>
+              <div className="iconosbarra">
+                <IoMdSettings size={20} />
+                <Link to="/Ajustes" className="nav-link">Contraseñas</Link>
+              </div>
+            </li>
+            <li>
+              <div className="iconosbarra">
+                <FiDatabase size={20} />
+                <Link to="/avanzado" className="nav-link">Copia de seguridad</Link>
+              </div>
+            </li>
+            <li>
+              <div className="iconosbarra">
+                <FaPowerOff size={20} />
+                <Link to="/inicio" className="nav-link">Cerrar sesión</Link>
+              </div>
+            </li>
+          </ul>
         </div>
         <div className="content">
           <div id="page-content-wrapper" className="content-wrapper">
@@ -197,7 +220,23 @@ function AdminUsuarios() {
                         {usuariosPaginados.map((user) => (
                           <tr key={user.staffID}>
                             <td>{user.staffID}</td>
-                            <td>{user.username}</td>
+                            <td>
+                              {editingUserId === user.staffID ? (
+                                <input
+                                  type="text"
+                                  value={editingUserName}
+                                  onChange={(e) => setEditingUserName(e.target.value)}
+                                  onBlur={() => handleUpdateUserName(user.staffID)}
+                                  onKeyDown={(e) => handleKeyDown(e, user.staffID)}
+                                  autoFocus
+                                />
+                              ) : (
+                                <>
+                                  {user.username}
+                                  <FiEdit className="ms-2" onClick={() => handleEditUserName(user)} style={{ cursor: 'pointer' }} />
+                                </>
+                              )}
+                            </td>
                             <td>{user.status ? "Activo" : "Inactivo"}</td>
                             <td>
                               <select className="form-select" value={user.role} onChange={(e) => handleActualizarRol(user.staffID, e.target.value)}>

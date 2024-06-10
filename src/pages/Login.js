@@ -1,24 +1,35 @@
 import React, { useState } from "react";
 import { FaUser } from "react-icons/fa";
+import ReCAPTCHA from "react-google-recaptcha";
 import './Login.css';
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [captcha, setCaptcha] = useState(null);
 
     const handleInputChange = (e, setter) => {
         setter(e.target.value);
     };
 
+    const handleCaptchaChange = (value) => {
+        setCaptcha(value);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!captcha) {
+            alert('Por favor, complete el CAPTCHA');
+            return;
+        }
+
         try {
             const response = await fetch('http://127.0.0.1:8000/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ username, password }),
+                body: JSON.stringify({ username, password, captcha }),
             });
 
             const data = await response.json();
@@ -93,6 +104,12 @@ const Login = () => {
                             <span className="label-char" style={{'--index': 6}}>r</span>
                             <span className="label-char" style={{'--index': 7}}>d</span>
                         </label>
+                    </div>
+                    <div className="recaptcha-wrapper">
+                        <ReCAPTCHA
+                            sitekey="6LczrvUpAAAAANaraFDZmN3lhEv30kf-MqRhy8hW"
+                            onChange={handleCaptchaChange}
+                        />
                     </div>
                     <button type="submit" className="btnn">Iniciar sesión</button>
                 </form>
