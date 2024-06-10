@@ -1,4 +1,3 @@
-// Importa las bibliotecas necesarias y los estilos CSS
 import React, { useState, useEffect } from 'react';
 import { AiFillControl } from "react-icons/ai";
 import { MdRestaurant } from "react-icons/md";
@@ -16,14 +15,24 @@ function MenuComponent() {
   const [categoriaActiva, setCategoriaActiva] = useState(null);
 
   useEffect(() => {
-    obtenerCategoriasPlatos();
-    obtenerMesas();
+    const intervalId = setInterval(() => {
+      obtenerCategoriasPlatos();
+      obtenerMesas();
+    }, 2000); // Actualiza cada 10 segundos
+
+    // Limpiar el intervalo cuando el componente se desmonte
+    return () => clearInterval(intervalId);
   }, []);
 
   const obtenerCategoriasPlatos = async () => {
     try {
       const response = await axios.get('http://127.0.0.1:8000/api/categorias-platos');
-      setCategoriasPlatos(response.data.categorias);
+      // Filtrar categorías y platos activos
+      const categoriasActivas = response.data.categorias.filter(categoria => categoria.activate === 1);
+      categoriasActivas.forEach(categoria => {
+        categoria.items = categoria.items.filter(item => item.activate === 1);
+      });
+      setCategoriasPlatos(categoriasActivas);
     } catch (error) {
       console.error('Error al obtener categorías y platos:', error);
     }
@@ -32,7 +41,9 @@ function MenuComponent() {
   const obtenerMesas = async () => {
     try {
       const response = await axios.get('http://127.0.0.1:8000/api/obtener-mesas');
-      setMesas(response.data.mesas);
+      // Filtrar mesas activas
+      const mesasActivas = response.data.mesas.filter(mesa => mesa.activate === 1);
+      setMesas(mesasActivas);
     } catch (error) {
       console.error('Error al obtener las mesas:', error);
     }
@@ -68,7 +79,7 @@ function MenuComponent() {
         console.error('Por favor, selecciona una mesa y al menos un plato para enviar la orden.');
         return;
       }
-  
+
       const ordenData = {
         mesaID: parseInt(mesaID), // Asegurarse de convertir a entero si es necesario
         items: platosSeleccionados.map(plato => ({
@@ -77,15 +88,15 @@ function MenuComponent() {
           menuID: plato.menuID
         }))
       };
-  
+
       const response = await axios.post('http://127.0.0.1:8000/api/insertar-orden', ordenData);
       console.log('Respuesta del servidor:', response.data);
-  
+
       // Limpiar platos seleccionados y mesa después de enviar la orden
       setPlatosSeleccionados([]);
       setMesaID('');
       setTotalCompra(0);
-  
+
       // Aquí puedes manejar la respuesta del servidor según tus necesidades
       alert('Orden enviada correctamente!');
     } catch (error) {
@@ -93,7 +104,6 @@ function MenuComponent() {
       alert('Error al enviar la orden. Por favor, inténtalo de nuevo.');
     }
   };
-  
 
   return (
     <div>
@@ -123,7 +133,7 @@ function MenuComponent() {
             </li>
           </ul>
         </div>
-        <div className="contenido">
+        <div className="content">
           <div className="categorias">
             <h2>Categorías</h2>
             {categoriasPlatos.map(categoria => (

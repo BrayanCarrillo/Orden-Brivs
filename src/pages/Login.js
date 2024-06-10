@@ -38,7 +38,11 @@ const Login = () => {
                         break;
                 }
             } else {
-                alert(data.error || 'Error al iniciar sesión');
+                if (response.status === 403 && data.error === "Usuario desactivado") {
+                    alert('Usuario desactivado. No puede ingresar.');
+                } else {
+                    alert(data.error || 'Error al iniciar sesión');
+                }
             }
         } catch (error) {
             console.error('Error al iniciar sesión:', error);

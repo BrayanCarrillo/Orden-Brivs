@@ -148,7 +148,7 @@ function Panel() {
                       <th>Total</th>
                       <th>Fecha</th>
                       <th>Mesa</th>
-                      <th>Nombre</th>
+                      <th>Nombre del plato</th>
                     </tr>
                   </thead>
                   <tbody>
