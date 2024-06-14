@@ -17,33 +17,35 @@ import PanelPedro from './pages/empleados/mesero/PanelPedro';
 import Orden from './pages/empleados/mesero/Orden';
 import AjustesPedro from './pages/empleados/mesero/AjustesPedro';
 import Avanzado from './pages/admin/avanzado'; 
-
+import ProtectedRoute from './components/ProtectedRoute';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (
-    <Router>
-      <Suspense fallback={<div className="loading">Loading...</div>}>
-        <Routes>
-          <Route exact path="/" element={<Inicio />} />
-          <Route path="/Login" element={<Login />} />
-          <Route path="/panel" element={<Panel />} />
-          <Route path="/adminusuarios" element={<AdminUsuarios />} />
-          <Route path="/Ajustes" element={<Ajustes />} />
-          <Route path="/Categoria" element={<Categoria />} />
-          <Route path="/Mesa" element={<Mesa />} />
-          <Route path="/Ventas" element={<Ventas />} />
-          <Route path="/Paneljuan" element={<Paneljuan />} />
-          <Route path="/Panelcocina" element={<Panelcocina />} />
-          <Route path="/Ajustesjuan" element={<Ajustesjuan />} />
-          <Route path="/PanelPedro" element={<PanelPedro />} />
-          <Route path="/Orden" element={<Orden />} />
-          <Route path="/AjustesPedro" element={<AjustesPedro />} />
-          <Route path="/inicio" element={<Inicio />} />
-          <Route path="/avanzado" element={<Avanzado />} /> 
-
-        </Routes>
-      </Suspense>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Suspense fallback={<div className="loading">Loading...</div>}>
+          <Routes>
+            <Route exact path="/" element={<Inicio />} />
+            <Route path="/Login" element={<Login />} />
+            <Route path="/panel" element={<ProtectedRoute element={<Panel />} />} />
+            <Route path="/adminusuarios" element={<ProtectedRoute element={<AdminUsuarios />} />} />
+            <Route path="/Ajustes" element={<ProtectedRoute element={<Ajustes />} />} />
+            <Route path="/Categoria" element={<ProtectedRoute element={<Categoria />} />} />
+            <Route path="/Mesa" element={<ProtectedRoute element={<Mesa />} />} />
+            <Route path="/Ventas" element={<ProtectedRoute element={<Ventas />} />} />
+            <Route path="/Paneljuan" element={<ProtectedRoute element={<Paneljuan />} />} />
+            <Route path="/Panelcocina" element={<ProtectedRoute element={<Panelcocina />} />} />
+            <Route path="/Ajustesjuan" element={<ProtectedRoute element={<Ajustesjuan />} />} />
+            <Route path="/PanelPedro" element={<ProtectedRoute element={<PanelPedro />} />} />
+            <Route path="/Orden" element={<ProtectedRoute element={<Orden />} />} />
+            <Route path="/AjustesPedro" element={<ProtectedRoute element={<AjustesPedro />} />} />
+            <Route path="/inicio" element={<Inicio />} />
+            <Route path="/avanzado" element={<ProtectedRoute element={<Avanzado />} />} /> 
+          </Routes>
+        </Suspense>
+      </Router>
+    </AuthProvider>
   );
 }
 

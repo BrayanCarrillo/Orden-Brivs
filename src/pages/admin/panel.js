@@ -43,8 +43,11 @@ function Panel() {
       const data = await response.json();
       const newReadyOrders = data.ordenes.filter(order => order.estado === 'listo');
 
-      if (newReadyOrders.length > ordenes.filter(order => order.estado === 'listo').length) {
-        setNewReadyOrdersCount(newReadyOrders.length);
+      const previousReadyOrdersCount = ordenes.filter(order => order.estado === 'listo').length;
+      const currentReadyOrdersCount = newReadyOrders.length;
+
+      if (currentReadyOrdersCount > previousReadyOrdersCount) {
+        setNewReadyOrdersCount(currentReadyOrdersCount - previousReadyOrdersCount);
       } else {
         setNewReadyOrdersCount(0);
       }

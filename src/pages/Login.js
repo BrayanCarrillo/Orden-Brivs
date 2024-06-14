@@ -1,12 +1,16 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import { FaUser } from "react-icons/fa";
 import ReCAPTCHA from "react-google-recaptcha";
+import { useAuth } from '../context/AuthContext';
 import './Login.css';
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [captcha, setCaptcha] = useState(null);
+    const { login } = useAuth();
+    const navigate = useNavigate();
 
     const handleInputChange = (e, setter) => {
         setter(e.target.value);
@@ -34,15 +38,16 @@ const Login = () => {
 
             const data = await response.json();
             if (response.ok) {
+                login(); // Set the user as authenticated
                 switch (data.role) {
                     case 'admin':
-                        window.location.href = '/panel';
+                        navigate('/panel');
                         break;
                     case 'chef':
-                        window.location.href = '/Paneljuan';
+                        navigate('/Paneljuan');
                         break;
                     case 'mesero':
-                        window.location.href = '/PanelPedro';
+                        navigate('/PanelPedro');
                         break;
                     default:
                         alert('Error al iniciar sesión');

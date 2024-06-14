@@ -11,7 +11,7 @@ import { FaPowerOff } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Toast, ToastContainer } from 'react-bootstrap';
+import { Toast, ToastContainer, Card, ListGroup, Button } from 'react-bootstrap';
 
 function Avanzado() {
     const [nextBackup, setNextBackup] = useState(() => {
@@ -22,6 +22,7 @@ function Avanzado() {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [toastVariant, setToastVariant] = useState('');
+    const [errorLog, setErrorLog] = useState([]);
 
     const showToastMessage = (message, variant) => {
         setToastMessage(message);
@@ -30,6 +31,11 @@ function Avanzado() {
         setTimeout(() => {
             setShowToast(false);
         }, 5000);
+    };
+
+    const logError = (error) => {
+        console.error('Error:', error);
+        setErrorLog(prevLog => [...prevLog, error.message || 'Error desconocido']);
     };
 
     const handleBackup = useCallback(async () => {
@@ -50,7 +56,7 @@ function Avanzado() {
 
             showToastMessage('Backup creado con éxito', 'success');
         } catch (error) {
-            console.error('Error creando el backup:', error);
+            logError(error);
             showToastMessage('Error creando el backup', 'danger');
         }
     }, []);
@@ -73,7 +79,7 @@ function Avanzado() {
                 console.log('Restore successful:', response.data);
                 showToastMessage('Restauración exitosa', 'success');
             } catch (error) {
-                console.error('Error restaurando el backup:', error);
+                logError(error);
                 showToastMessage('Error restaurando el backup', 'danger');
             }
         } else {
@@ -114,6 +120,10 @@ function Avanzado() {
     useEffect(() => {
         updateTimer();
     }, [nextBackup, updateTimer]);
+
+    const clearErrorLog = () => {
+        setErrorLog([]);
+    };
 
     return (
         <div>
@@ -185,6 +195,29 @@ function Avanzado() {
                         <input type="file" id="backupFileInput" name="backupFile" accept=".sql" className="form-control mb-2 mr-sm-2" required />
                         <button type="submit" className="btn btn-success mb-2">Restaurar Backup</button>
                     </form>
+                    <Card className="mt-3" bg="dark" text="white">
+                        <Card.Header>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <span>Log de Errores</span>
+                                <Button variant="danger" size="sm" onClick={clearErrorLog}>Limpiar Log</Button>
+                            </div>
+                        </Card.Header>
+                        <Card.Body style={{ maxHeight: '200px', overflowY: 'auto', fontFamily: 'monospace' }}>
+                            <ListGroup variant="flush">
+                                {errorLog.length === 0 ? (
+                                    <ListGroup.Item style={{ backgroundColor: 'black', color: 'white' }}>
+                                        No hay errores registrados
+                                    </ListGroup.Item>
+                                ) : (
+                                    errorLog.map((error, index) => (
+                                        <ListGroup.Item key={index} style={{ backgroundColor: 'black', color: 'red' }}>
+                                            {error}
+                                        </ListGroup.Item>
+                                    ))
+                                )}
+                            </ListGroup>
+                        </Card.Body>
+                    </Card>
                 </div>
                 <ToastContainer position="top-end" className="p-3">
                     <Toast onClose={() => setShowToast(false)} show={showToast} delay={5000} autohide bg={toastVariant}>
