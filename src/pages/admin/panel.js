@@ -1,34 +1,35 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react"; // Importaciones de React para manejar estados, efectos y referencias
 import './panel.css';
 import { AiFillControl } from "react-icons/ai";
 import { FiDatabase } from "react-icons/fi";
-import { MdOutlineRestaurant } from "react-icons/md";
+import { MdOutlineRestaurant, MdEventAvailable, MdTableRestaurant } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
 import { FaPowerOff } from "react-icons/fa";
-import { MdEventAvailable } from "react-icons/md";
 import { IoPersonCircle } from "react-icons/io5";
-import { MdTableRestaurant } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Table, Pagination, Button, Badge } from 'react-bootstrap';
 
 function Panel() {
-  const [ordenes, setOrdenes] = useState([]);
-  const [empleados, setEmpleados] = useState([]);
-  const [ordenesPagina, setOrdenesPagina] = useState(1);
-  const [empleadosPagina, setEmpleadosPagina] = useState(1);
-  const [newReadyOrdersCount, setNewReadyOrdersCount] = useState(0);
-  const [soundEnabled, setSoundEnabled] = useState(false);
-  const registrosPorPagina = 5;
-  const audioRef = useRef(new Audio('notification.mp3'));
+  // Estados para manejar datos y configuraciones del componente
+  const [ordenes, setOrdenes] = useState([]); // Órdenes listas
+  const [empleados, setEmpleados] = useState([]); // Lista de empleados
+  const [ordenesPagina, setOrdenesPagina] = useState(1); // Página actual de órdenes
+  const [empleadosPagina, setEmpleadosPagina] = useState(1); // Página actual de empleados
+  const [newReadyOrdersCount, setNewReadyOrdersCount] = useState(0); // Contador de nuevas órdenes listas
+  const [soundEnabled, setSoundEnabled] = useState(false); // Estado del sonido de notificación
+  const registrosPorPagina = 5; // Cantidad de registros por página para la paginación
+  const audioRef = useRef(new Audio('notification.mp3')); // Referencia a un objeto de audio
 
+  // Efecto para cargar datos y configurar intervalos de actualización
   useEffect(() => {
     fetchOrdenesListas();
     fetchEmpleados();
-    const interval = setInterval(fetchOrdenesListas, 3000); // Update every 3 seconds
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchOrdenesListas, 3000); // Actualiza cada 3 segundos
+    return () => clearInterval(interval); // Limpia el intervalo al desmontar
   }, []);
 
+  // Efecto para reproducir sonido cuando hay nuevas órdenes listas
   useEffect(() => {
     if (soundEnabled && newReadyOrdersCount > 0) {
       audioRef.current.play().catch(error => {
@@ -37,6 +38,7 @@ function Panel() {
     }
   }, [newReadyOrdersCount, soundEnabled]);
 
+  // Función para obtener órdenes listas desde la API
   const fetchOrdenesListas = async () => {
     try {
       const response = await fetch('http://127.0.0.1:8000/api/ordenes/listas');
@@ -58,6 +60,7 @@ function Panel() {
     }
   };
 
+  // Función para obtener la lista de empleados desde la API
   const fetchEmpleados = () => {
     axios.get('http://127.0.0.1:8000/api/employees')
       .then(response => {
@@ -68,6 +71,7 @@ function Panel() {
       });
   };
 
+  // Función para alternar el estado del sonido de notificación
   const toggleSound = () => {
     setSoundEnabled(prevSoundEnabled => {
       if (!prevSoundEnabled) {
@@ -79,19 +83,23 @@ function Panel() {
     });
   };
 
+  // Función para cambiar la página actual en la paginación
   const handlePageChange = (setPage, pageNumber) => {
     setPage(pageNumber);
   };
 
+  // Función para paginar los datos
   const paginar = (datos, paginaActual) => {
     const startIndex = (paginaActual - 1) * registrosPorPagina;
     const endIndex = startIndex + registrosPorPagina;
     return datos.slice(startIndex, endIndex);
   };
 
+  // Datos paginados de órdenes y empleados
   const ordenesPaginadas = paginar(ordenes, ordenesPagina);
   const empleadosPaginados = paginar(empleados, empleadosPagina);
 
+  // Renderiza la paginación
   const renderPagination = (items, currentPage, setPage) => {
     const totalPages = Math.ceil(items.length / registrosPorPagina);
     const paginationItems = [];
@@ -118,6 +126,7 @@ function Panel() {
       <div className="wrapper">
         <div className="sidebar">
           <ul>
+            {/* Menú de navegación en la barra lateral */}
             <li>
               <div className="iconosbarra">
                 <AiFillControl size={20} />
@@ -245,4 +254,4 @@ function Panel() {
   );
 }
 
-export default Panel;
+export default Panel; // Exporta el componente

@@ -61,17 +61,18 @@ function Avanzado() {
         }
     }, []);
 
-    const handleRestore = async (event) => {
+    const handleRestore = async (event, type) => {
         event.preventDefault();
         const fileInput = document.getElementById('backupFileInput');
         const file = fileInput.files[0];
 
-        if (file && file.name.endsWith('.sql')) {
+        if (file) {
             const formData = new FormData();
             formData.append('backupFile', file);
 
             try {
-                const response = await axios.post('http://127.0.0.1:8000/api/restore', formData, {
+                const url = type === 'full' ? 'http://127.0.0.1:8000/api/restore' : 'http://127.0.0.1:8000/api/restore-data-only';
+                const response = await axios.post(url, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
@@ -83,7 +84,7 @@ function Avanzado() {
                 showToastMessage('Error restaurando el backup', 'danger');
             }
         } else {
-            showToastMessage('El archivo debe ser un archivo .sql', 'warning');
+            showToastMessage('Debe seleccionar un archivo para restaurar', 'warning');
         }
     };
 
@@ -170,18 +171,17 @@ function Avanzado() {
                             </div>
                         </li>
                         <li>
-                        <li>
                             <div className="iconosbarra">
                                 <FiDatabase size={20} />
                                 <Link to="/avanzado" className="nav-link">Copia de seguridad</Link>
                             </div>
                         </li>
+                        <li>
                             <div className="iconosbarra">
                                 <FaPowerOff size={20} />
                                 <Link to="/inicio" className="nav-link">Cerrar sesión</Link>
                             </div>
                         </li>
-
                     </ul>
                 </div>
                 <div className="content container mt-4">
@@ -191,9 +191,10 @@ function Avanzado() {
                         <p>{timeLeft}</p>
                     </div>
                     <button onClick={handleBackup} className="btn btn-primary mb-3">Hacer Backup</button>
-                    <form onSubmit={handleRestore} className="form-inline">
-                        <input type="file" id="backupFileInput" name="backupFile" accept=".sql" className="form-control mb-2 mr-sm-2" required />
-                        <button type="submit" className="btn btn-success mb-2">Restaurar Backup</button>
+                    <form className="form-inline">
+                        <input type="file" id="backupFileInput" name="backupFile" className="form-control mb-2 mr-sm-2" required />
+                        <button onClick={(event) => handleRestore(event, 'full')} className="btn btn-success mb-2">Restaurar Backup Completo</button>
+                        <button onClick={(event) => handleRestore(event, 'data')} className="btn btn-info mb-2 ml-2">Restaurar Sólo Datos</button>
                     </form>
                     <Card className="mt-3" bg="dark" text="white">
                         <Card.Header>
